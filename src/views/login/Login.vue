@@ -1,7 +1,7 @@
 <template>
     <div class="login-wrapper">
         <div class="login-cart">
-            <p class="login-text">Vue Timetable</p>
+            <p class="login-text">普宁市XX驾校练车预约系统</p>
 
             <!-- 输入 -->
             <div class="input-wrapper">
@@ -17,15 +17,14 @@
             <!-- 角色选择 -->
             <div class="role-wrap">
                 <input type="radio" id="student" value="student" v-model="logindata.role" />
-                <label for="student">学生</label>
+                <label for="student">学员</label>
                 <input type="radio" id="teacher" value="teacher" v-model="logindata.role" />
-                <label for="teacher">教师</label>
+                <label for="teacher">教练</label>
                 <input type="radio" id="admin" value="admin" v-model="logindata.role" />
                 <label for="admin">管理员</label>
             </div>
 
             <button class="loginbt" @click="loginHandle">登 录</button>
-            <p class="tip">账号:任意&nbsp;&nbsp;&nbsp;密码:任意</p>
         </div>
     </div>
 </template>
@@ -194,13 +193,6 @@ async function loginHandle() {
             &:hover {
                 background-color: rgb(142, 190, 138);
             }
-        }
-
-        .tip {
-            color: rgb(240, 240, 240);
-            font-size: 12px;
-            margin-left: 55px;
-            text-align: left;
         }
     }
 }

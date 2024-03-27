@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "node":"node ./data/index.js",
+    "node": "node ./data/index.js",
     "dev": "concurrently \"node ./data/index.js\" \"vue-cli-service serve\""
   },
   "dependencies": {
@@ -19,6 +19,7 @@
     "nprogress": "^0.2.0",
     "path": "^0.12.7",
     "pinia": "^2.0.18",
+    "prettier": "^3.2.5",
     "vue": "^3.2.13",
     "vue-router": "^4.1.3"
   },
