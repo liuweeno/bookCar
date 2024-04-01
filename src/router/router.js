@@ -46,7 +46,7 @@ const routes = [
         path: 'classroom',
         name: 'classroomMenu',
         redirect: '/classroom/classroom-query',
-        meta: { title: '预约', icon: 'icon-jiaoshi', limit: ['admin', 'teacher', 'student'] },
+        meta: { title: '预约', icon: 'icon-jiaoshi', limit: ['student'] },
         children: [
           // {
           //   path: 'classroom-query',
@@ -93,12 +93,6 @@ const routes = [
         name: 'StudentInfo',
         component: () => import('@/views/userpages/teacher/StudentInfo.vue'),
         meta: { title: '学生信息', icon: 'icon-xuesheng', limit: ['teacher'], cache: true },
-      },
-      {
-        path: 'teaching',
-        name: 'Teaching',
-        component: () => import('@/views/userpages/teacher/Teaching.vue'),
-        meta: { title: '教学安排', icon: 'icon-calendar-alt', limit: ['teacher'], cache: true },
       },
     ],
   },
