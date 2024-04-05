@@ -1,6 +1,6 @@
 <template>
   <div class="carInfo">
-    <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">Add</a-button>
+    <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加新的汽车</a-button>
     <a-table bordered :data-source="dataSource" :columns="columns">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'name'">
@@ -19,14 +19,58 @@
           <a-popconfirm v-if="dataSource.length" title="Sure to delete?" @confirm="onDelete(record.key)">
             <a>Delete</a>
           </a-popconfirm>
+          <!--          TODO 将edit导入到该页面中-->
+          <div class="editable-row-operations">
+            <span v-if="editableData[record.key]">
+              <a-typography-link @click="save(record.key)">Save</a-typography-link>
+              <a-popconfirm title="Sure to cancel?" @confirm="cancel(record.key)">
+                <a>Cancel</a>
+              </a-popconfirm>
+            </span>
+            <span v-else>
+              <a @click="edit(record.key)">Edit</a>
+            </span>
+          </div>
         </template>
       </template>
     </a-table>
   </div>
+  <a-modal v-model:open="showAddModal" title="添加新的汽车" @ok="confirmAdd">
+    <a-form
+      :model="newCarForm"
+      name="basic"
+      :label-col="{ span: 8 }"
+      :wrapper-col="{ span: 16 }"
+      autocomplete="off"
+      @finish="onFinish"
+      @finishFailed="onFinishFailed"
+      centered="true"
+    >
+      <a-form-item label="汽车品牌" name="brand" :rules="[{ required: true, message: 'Please input your username!' }]">
+        <a-input v-model:value="newCarForm.brand" />
+      </a-form-item>
+      <a-form-item label="型号" name="model" :rules="[{ required: true, message: 'Please input your username!' }]">
+        <a-input v-model:value="newCarForm.model" />
+      </a-form-item>
+      <a-form-item label="车牌号" name="plate" :rules="[{ required: true, message: 'Please input your username!' }]">
+        <a-input v-model:value="newCarForm.plate" />
+      </a-form-item>
+      <a-form-item
+        label="持有者手机号"
+        name="ownerPhone"
+        :rules="[{ required: true, message: 'Please input your username!' }]"
+      >
+        <a-input v-model:value="newCarForm.ownerPhone" />
+      </a-form-item>
+      <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+        <a-button type="primary" html-type="submit">Submit</a-button>
+      </a-form-item>
+    </a-form>
+  </a-modal>
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 const columns = [
   {
@@ -61,8 +105,14 @@ const dataSource = ref([
     address: 'London, Park Lane no. 1',
   },
 ]);
-const count = computed(() => dataSource.value.length + 1);
 const editableData = reactive({});
+const showAddModal = ref(false);
+const newCarForm = reactive({
+  brand: '',
+  model: '',
+  plate: '',
+  ownerPhone: '',
+});
 const edit = (key) => {
   editableData[key] = cloneDeep(dataSource.value.filter((item) => key === item.key)[0]);
 };
@@ -74,13 +124,11 @@ const onDelete = (key) => {
   dataSource.value = dataSource.value.filter((item) => item.key !== key);
 };
 const handleAdd = () => {
-  const newData = {
-    key: `${count.value}`,
-    name: `Edward King ${count.value}`,
-    age: 32,
-    address: `London, Park Lane no. ${count.value}`,
-  };
-  dataSource.value.push(newData);
+  showAddModal.value = true;
+};
+
+const confirmAdd = () => {
+  showAddModal.value = false;
 };
 </script>
 
@@ -129,5 +177,8 @@ const handleAdd = () => {
 }
 .editable-cell:hover .editable-cell-icon {
   display: inline-block;
+}
+.editable-row-operations a {
+  margin-right: 8px;
 }
 </style>

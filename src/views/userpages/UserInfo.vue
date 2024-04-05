@@ -1,60 +1,36 @@
 <template>
   <div class="appmain">
-    <div class="app-blockdiv info-wrap">
-      <div class="appblock top">
-        <span class="icon-wrap phone">
-          <i class="iconfont icon-shouji"></i>
-        </span>
-        <span class="bind-text">
-          <h3>绑定手机</h3>
-          <p>未绑定</p>
-        </span>
-        <button class="change-bt phone">更改手机</button>
-      </div>
-
-      <div class="appblock top">
-        <span class="icon-wrap weixin">
-          <i class="iconfont icon-weixin"></i>
-        </span>
-        <span class="bind-text">
-          <h3>绑定微信</h3>
-          <p>未绑定</p>
-        </span>
-        <button class="change-bt weixin">更改微信</button>
-      </div>
-
-      <div class="appblock login-history-wrap">
-        <h2 class="block-header">
-          <i class="iconfont icon-shuju1 icon" style="color: darkcyan"></i>
-          <span>最近的登录历史</span>
-          <span class="more" @click="router.push({ name: 'LogHistory' })">更多 ></span>
-        </h2>
-        <table class="apptable login-history">
-          <tr>
-            <th>登录方式</th>
-            <th>设备名称</th>
-            <th>系统</th>
-            <th>登录地点</th>
-            <th>登录时间</th>
-          </tr>
-          <tr v-for="item in data.historyList">
-            <td>{{ item.logMethods }}</td>
-            <td>{{ item.logMechine }}</td>
-            <td>{{ item.logSystem }}</td>
-            <td>{{ item.logPlace }}</td>
-            <td>{{ item.logTime }}</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- 个人介绍 -->
-    <div class="app-blockdiv intro-wrap">
-      <div class="appcart intro-cart">
-        <div class="portrait-wrap">
-          <img src="@/assets/imgs/head_portrait.jpg" />
+    <div class="info-wrap">
+      <div class="control">
+        <div class="appblock top">
+          <span class="icon-wrap phone">
+            <i class="iconfont icon-shouji"></i>
+          </span>
+          <span class="bind-text">
+            <h3>绑定手机</h3>
+            <p>未绑定</p>
+          </span>
+          <button class="change-bt phone" @click="openChangePhone = true">更改手机</button>
         </div>
-        <h2 class="username">{{ userStore.userName }}</h2>
+        <div class="appblock top">
+          <span class="icon-wrap phone">
+            <i class="iconfont icon-shouji"></i>
+          </span>
+          <span class="bind-text">
+            <h3>更改教练手机号</h3>
+            <p>未绑定</p>
+          </span>
+          <button class="change-bt phone" @click="openChangeCoachPhone = true">更改教练手机号</button>
+        </div>
+      </div>
+
+      <div class="appcart intro-cart">
+        <div class="avatar-name">
+          <div class="portrait-wrap">
+            <img src="@/assets/imgs/head_portrait.jpg" />
+          </div>
+          <h2 class="username">{{ userStore.userName }}</h2>
+        </div>
         <div class="detail-area">
           <p>
             <i class="iconfont icon-yonghu"></i> <span>{{ userStore.userName }}</span>
@@ -66,12 +42,18 @@
         </div>
       </div>
     </div>
+    <a-modal v-model:open="openChangePhone" cancelText="取消" title="修改绑定手机号" @ok="handleOk('user')">
+      <a-input v-model:value="newPhone" placeholder="输入修改后的手机号" />
+    </a-modal>
+    <a-modal v-model:open="openChangeCoachPhone" cancelText="取消" title="修改教练手机号" @ok="handleOk('coach')">
+      <a-input v-model:value="newPhone" placeholder="输入修改后的手机号" />
+    </a-modal>
   </div>
 </template>
 
 <script setup>
 import { useUserStore } from '@/store';
-import { reactive, onBeforeMount } from 'vue';
+import { reactive, onBeforeMount, ref } from 'vue';
 import { reLogHistory } from '@/api/common.js';
 import { useRouter } from 'vue-router';
 
@@ -80,6 +62,9 @@ const router = useRouter();
 const data = reactive({
   historyList: null,
 });
+const openChangePhone = ref(false);
+const openChangeCoachPhone = ref(false);
+const newPhone = ref('');
 
 //获取登录历史
 async function getHistory(page = 1) {
@@ -91,221 +76,106 @@ async function getHistory(page = 1) {
   }
 }
 
+function handleOk(value) {
+  if (value === 'user') {
+    console.log('修改用户手机号');
+  } else {
+    console.log('修改教练手机号');
+  }
+  openChangePhone.value = false;
+}
+
 onBeforeMount(() => {
   getHistory(1);
 });
 </script>
 
 <style lang="less" scoped>
-.intro-wrap {
-  width: 30%;
-  align-items: flex-start;
-  flex: 0 0 auto;
+.info-wrap {
+  width: 60%;
+  .flex-mode(column, flex-start, flex-start);
 
-  .intro-cart {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .control {
+    width: 100%;
+    .flex-mode(row,flex-start,flex-start);
 
-    .portrait-wrap {
-      width: 25%;
-      border-radius: 50%;
-      overflow: hidden;
-      margin: 12px;
+    .top {
+      flex: 1;
+      height: 80px;
+      position: relative;
+      padding: 12px 8px;
 
-      img {
-        width: 100%;
-      }
-    }
-
-    .username {
-      font-weight: bolder;
-      font-size: calc(@baseSize * 1.4);
-    }
-    .brief-intro {
-      color: rgb(170, 170, 170);
-      margin: 6px;
-    }
-    .github {
-      display: flex;
-      align-items: center;
-      border-radius: 999em;
-      background-color: @theme-main-color1;
-      color: white;
-      padding: 2px 16px;
-      margin: 8px;
-      cursor: pointer;
-      &:hover {
-        background-color: @theme-main-color2;
-      }
-
-      i {
-        font-size: 22px;
-      }
-      a {
-        margin-left: 8px;
-        font-size: @baseSize;
-        text-decoration: none;
+      .icon-wrap {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        border-radius: 50%;
+        background-color: grey;
+        text-align: center;
         color: white;
-      }
-    }
-
-    .detail-area {
-      width: 85%;
-      margin: 20px;
-
-      p {
-        color: rgb(51, 51, 51);
-        font-size: @baseSize;
-        margin: 8px 0px;
+        box-shadow: 0px 0px 5px 5px rgba(212, 162, 162, 0.2);
 
         i {
-          font-size: calc(@baseSize * 1.1);
-          margin-right: 4px;
+          font-size: 22px;
+        }
+      }
+      .phone {
+        background-color: rgb(197, 148, 202);
+        box-shadow: 0px 0px 5px 5px rgba(182, 151, 201, 0.3);
+      }
+      .email {
+        background-color: rgb(109, 166, 219);
+        box-shadow: 0px 0px 5px 5px rgba(109, 166, 219, 0.3);
+      }
+      .weixin {
+        background-color: rgb(128, 207, 181);
+        box-shadow: 0px 0px 5px 5px rgba(133, 218, 190, 0.3);
+      }
+      .qq {
+        background-color: rgb(241, 176, 122);
+        box-shadow: 0px 0px 5px 5px rgba(241, 176, 122, 0.3);
+      }
+
+      .bind-text {
+        display: inline-block;
+        margin-left: 16px;
+        height: 40px;
+        vertical-align: bottom;
+
+        h3 {
+          margin-top: 2px;
           font-weight: bolder;
         }
-      }
-
-      .tagp {
-        border-top: 1px solid rgb(211, 211, 211);
-        margin-top: 12px;
-        padding: 12px 0px;
-        font-weight: bolder;
-      }
-
-      .tag-wrap {
-        .tag {
-          background-color: rgb(236, 245, 255);
-          color: rgb(107, 172, 247);
-          border: 1px solid rgb(193, 211, 233);
-          font-size: @baseSize;
-          margin-right: 8px;
-          padding: 2px 6px;
+        p {
+          margin-top: 3px;
+          color: rgb(180, 180, 180);
         }
       }
-    }
-  }
-}
 
-.info-wrap {
-  width: 70%;
-  align-items: flex-start;
-  flex-direction: row;
-
-  .top {
-    width: 20%;
-    height: 80px;
-    flex: 1 0 auto;
-    position: relative;
-    padding: 12px 8px;
-
-    .icon-wrap {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      line-height: 40px;
-      border-radius: 50%;
-      background-color: grey;
-      text-align: center;
-      color: white;
-      box-shadow: 0px 0px 5px 5px rgba(212, 162, 162, 0.2);
-
-      i {
-        font-size: 22px;
-      }
-    }
-    .phone {
-      background-color: rgb(197, 148, 202);
-      box-shadow: 0px 0px 5px 5px rgba(182, 151, 201, 0.3);
-    }
-    .email {
-      background-color: rgb(109, 166, 219);
-      box-shadow: 0px 0px 5px 5px rgba(109, 166, 219, 0.3);
-    }
-    .weixin {
-      background-color: rgb(128, 207, 181);
-      box-shadow: 0px 0px 5px 5px rgba(133, 218, 190, 0.3);
-    }
-    .qq {
-      background-color: rgb(241, 176, 122);
-      box-shadow: 0px 0px 5px 5px rgba(241, 176, 122, 0.3);
-    }
-
-    .bind-text {
-      display: inline-block;
-      margin-left: 16px;
-      height: 40px;
-      vertical-align: bottom;
-
-      h3 {
-        margin-top: 2px;
-        font-weight: bolder;
-      }
-      p {
-        margin-top: 3px;
-        color: rgb(180, 180, 180);
-      }
-    }
-
-    .change-bt {
-      position: absolute;
-      bottom: 8%;
-      right: 5%;
-      font-size: calc(@baseSize * 0.9);
-      color: white;
-      padding: 6px 12px;
-      border: 0;
-      border-radius: 5px;
-      box-shadow: 0px 0px 0px 0px;
-      cursor: pointer;
-    }
-  }
-
-  .login-history-wrap {
-    width: 100%;
-
-    .icon {
-      display: inline-block;
-      height: 20px;
-      line-height: 20px;
-      font-size: 20px;
-      padding-right: 4px;
-      color: rgb(49, 49, 49);
-    }
-
-    .block-header {
-      padding-bottom: 12px;
-      margin-bottom: 12px;
-      border-bottom: 1px solid rgb(204, 204, 204);
-      font-size: calc(@baseSize * 1.2);
-      font-weight: bolder;
-      color: rgb(100, 100, 100);
-      position: relative;
-
-      span.more {
+      .change-bt {
         position: absolute;
-        right: 2%;
-        bottom: 12px;
+        bottom: 8%;
+        right: 5%;
         font-size: calc(@baseSize * 0.9);
-        font-weight: normal;
+        color: white;
+        padding: 6px 12px;
+        border: 0;
+        border-radius: 5px;
+        box-shadow: 0px 0px 0px 0px;
         cursor: pointer;
-        color: rgb(156, 156, 156);
-        &:hover {
-          color: @theme-main-color2;
-        }
       }
     }
+  }
 
-    .login-history {
-      outline: 0;
-
-      th,
-      td {
-        outline: 0;
-        border-bottom: 1px solid rgb(226, 226, 226);
-      }
-      tr:hover {
-        background-color: rgb(241, 241, 241);
+  .intro-cart {
+    width: 100%;
+    .flex-mode(row, flex-start, flex-start);
+    gap: 16px;
+    .avatar-name {
+      .username {
+        margin-top: 8px;
+        text-align: center;
       }
     }
   }

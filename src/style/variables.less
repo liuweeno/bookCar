@@ -14,3 +14,14 @@
 
 
 @test:rgb(44, 80, 97);
+
+.flex-mode(@direction: row, @justify: center, @align: center) {
+  display: flex;
+  flex-direction: @direction;
+  justify-content: @justify;
+  align-items: @align;
+}
+
+.br(@color: red) {
+  border: 1px solid @color;
+}

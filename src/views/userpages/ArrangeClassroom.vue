@@ -8,8 +8,8 @@
       <table class="apptable revarse-table">
         <tr>
           <th>预约日期</th>
-          <th>学生</th>
-          <!--          <th>教练</th>-->
+          <th>具体时间段</th>
+          <th>教练</th>
           <th>审批状态</th>
           <th>预约操作</th>
         </tr>
@@ -58,7 +58,7 @@
           </div>
           <div class="mes-div">
             <SelectBlock atr="时间段" describe="选择具体时间段" :change="changeTimeSlot">
-              <li v-for="i in 13">{{ i }}</li>
+              <li v-for="i in ['上午', '下午', '晚上']">{{ i }}</li>
             </SelectBlock>
             <span class="time-label" v-for="i in reserveParams.timeslot" :key="i">
               {{ i }}<i class="label-close" @click="changeTimeSlot(i, true)">X</i>

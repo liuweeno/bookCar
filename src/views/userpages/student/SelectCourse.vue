@@ -1,20 +1,14 @@
 <template>
   <div class="appmain">
-    <div class="appcart">
-      <SelectBlock atr="学期" describe="请选择" v-model="data.semester">
-        <li>第一学期</li>
-      </SelectBlock>
-    </div>
-
     <div class="appcart courselist-wrap">
-      <h2 class="title">第一学期 可选课程</h2>
+      <h2 class="title">可操作的预约申请</h2>
       <table class="apptable">
         <tr>
-          <th>课程名称</th>
-          <th>教师</th>
-          <th>节次</th>
-          <th>教室</th>
-          <th>学分</th>
+          <th>学生姓名</th>
+          <th>学生手机号</th>
+          <th>时期</th>
+          <th>具体时间段</th>
+          <th>审核状态</th>
           <th>操作</th>
         </tr>
         <tr v-show="data.courseList.length == 0">

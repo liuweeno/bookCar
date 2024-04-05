@@ -1,16 +1,13 @@
 <template>
   <div class="appmain">
     <div class="appcart courselist-wrap">
-      <h2 class="title">第一学期 已选课程</h2>
-      <button class="selbt" @click="router.push({ name: 'SelectCourse' })">选课 +</button>
+      <h2 class="title">已审核通过的预约</h2>
       <table class="apptable">
         <tr>
-          <th>课程名称</th>
-          <th>教师</th>
-          <th>节次</th>
-          <th>教室</th>
-          <th>学分</th>
-          <th>操作</th>
+          <th>学生姓名</th>
+          <th>学生手机号</th>
+          <th>时期</th>
+          <th>具体时间段</th>
         </tr>
         <tr v-show="data.courseList.length == 0">
           <td class="nodata" colspan="6">No Data</td>
@@ -20,10 +17,6 @@
           <td>{{ item.teacher }}</td>
           <td>{{ item.timeslot }}</td>
           <td>{{ item.classroom }}</td>
-          <td>{{ item.credit }}</td>
-          <td>
-            <i class="iconfont icon-shanchu" :class="{ 'bt-active': !item.isNecess }" @click="confirmCancel(item)"></i>
-          </td>
         </tr>
       </table>
     </div>

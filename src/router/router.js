@@ -83,85 +83,16 @@ const routes = [
         ],
       },
       {
-        path: 'timetable',
-        name: 'UserTimeTable',
-        component: () => import('@/views/userpages/student/UserTimeTable.vue'),
-        meta: { title: '课程表', icon: 'icon-calendar-alt', limit: ['admin'], cache: true },
-      },
-      {
         path: 'studentinfo',
         name: 'StudentInfo',
         component: () => import('@/views/userpages/teacher/StudentInfo.vue'),
-        meta: { title: '学生信息', icon: 'icon-xuesheng', limit: ['teacher'], cache: true },
-      },
-    ],
-  },
-  {
-    path: '/menu',
-    name: 'menu',
-    redirect: '/menu/menu1',
-    component: Layout,
-    meta: { title: 'menu', icon: 'icon-caidan', limit: ['admin'] },
-    children: [
-      {
-        path: 'menu1',
-        name: 'submenu1',
-        component: () => import('@/views/userpages/submenu_dome/submenu1'),
-        meta: { title: 'menu1', icon: 'icon-caidan', limit: ['admin'] },
-        children: [
-          {
-            path: 'menu1-1',
-            name: 'submenu1-1',
-            component: () => import('@/views/userpages/submenu_dome/submenu1-1'),
-            meta: { title: 'menu1-1', icon: 'icon-caidan', limit: ['admin'] },
-          },
-          {
-            path: 'menu1-2',
-            name: 'submenu1-2',
-            component: () => import('@/views/userpages/submenu_dome/submenu1-2'),
-            meta: { title: 'menu1-2', icon: 'icon-caidan', limit: ['admin'] },
-          },
-        ],
+        meta: { title: '学生信息管理', icon: 'icon-xuesheng', limit: ['admin'], cache: true },
       },
       {
-        path: 'menu2',
-        name: 'submenu2',
-        component: () => import('@/views/userpages/submenu_dome/submenu2'),
-        meta: { title: 'menu2', icon: 'icon-caidan', limit: ['admin'] },
-      },
-    ],
-  },
-  {
-    path: '/external-link',
-    component: Layout,
-    meta: { title: '外链', icon: 'icon-lianjie', isLink: true, limit: ['admin'] },
-    children: [
-      {
-        path: 'https://cn.vuejs.org/',
-        meta: { title: 'Vue', icon: '', isLink: true },
-      },
-      {
-        path: 'https://github.com/',
-        meta: { title: 'Github', icon: '', isLink: true },
-      },
-    ],
-  },
-  {
-    path: '/error',
-    component: Layout,
-    meta: { title: '错误页面', icon: 'icon-caidan', limit: ['admin'] },
-    children: [
-      {
-        path: '404',
-        name: '404',
-        component: () => import('@/views/error/404.vue'),
-        meta: { title: '404', icon: '', limit: ['admin'] },
-      },
-      {
-        path: '401',
-        name: '401',
-        component: () => import('@/views/error/401.vue'),
-        meta: { title: '401', icon: '', limit: ['admin'] },
+        path: 'carinfo',
+        name: 'CarInfo',
+        component: () => import('@/views/userpages/teacher/CarInfo.vue'),
+        meta: { title: '车辆信息管理', icon: 'icon-xuesheng', limit: ['admin'], cache: true },
       },
     ],
   },
