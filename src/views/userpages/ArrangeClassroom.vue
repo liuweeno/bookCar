@@ -13,10 +13,10 @@
           <th>审批状态</th>
           <th>预约操作</th>
         </tr>
-        <tr v-show="roomList.list.length === 0">
+        <tr v-show="orderList.list.length === 0">
           <td class="nodata" colspan="5">No Data</td>
         </tr>
-        <tr v-for="item in roomList.list" :key="item.id">
+        <tr v-for="item in orderList.list" :key="item.id">
           <td>{{ item.date }}</td>
           <td>{{ areaMap[item.area] }}</td>
           <td>{{ item.Cid }}</td>
@@ -57,27 +57,19 @@
             </SelectBlock>
           </div>
           <div class="mes-div">
-            <SelectBlock atr="时间段" describe="选择具体时间段" :change="changeTimeSlot">
-              <li v-for="i in ['上午', '下午', '晚上']">{{ i }}</li>
-            </SelectBlock>
-            <span class="time-label" v-for="i in reserveParams.timeslot" :key="i">
-              {{ i }}<i class="label-close" @click="changeTimeSlot(i, true)">X</i>
-            </span>
+            <span class="mes-span">时间段</span>
+            <a-radio-group v-model:value="reserveParams.timeslot">
+              <a-radio :value="0">上午</a-radio>
+              <a-radio :value="1">下午</a-radio>
+              <a-radio :value="2">晚上</a-radio>
+            </a-radio-group>
           </div>
-          <!--          <div class="mes-div">-->
-          <!--            <SelectBlock atr="教练" describe="请选择教练" v-model="reserveParams.campus" :change="getUsableClassroom">-->
-          <!--              <li svalue="ds">王教练 17748690263</li>-->
-          <!--              <li svalue="zq">主校区</li>-->
-          <!--              <li svalue="ql">启林</li>-->
-          <!--              <li svalue="xq">西校区</li>-->
-          <!--            </SelectBlock>-->
-          <!--          </div>-->
           <div class="mes-div">
             <span class="mes-span">备注</span>
             <textarea v-model="reserveParams.remark" placeholder="添加备注" class="remark-textarea"></textarea>
           </div>
 
-          <i class="comfirm-bt" @click="addReserve">确认</i>
+          <i class="comfirm-bt" @click="addReserveFn">确认</i>
           <i class="cancel-bt" @click="addReserveShow = false">取消</i>
         </div>
       </div>
@@ -123,6 +115,7 @@ import {
 import SelectBlock from '@/components/SelectBlock.vue';
 import { useRoute } from 'vue-router';
 import Bus from '@/utils/bus';
+import { addReserve } from '@/api/student.js';
 
 const route = useRoute();
 const date = new Date();
@@ -155,16 +148,13 @@ const detailShow = ref(false);
 const reserveDetail = ref(null);
 let deleteId = null;
 let forbidWatchMonth = false;
-const roomList = reactive({
+const orderList = reactive({
   list: [],
 });
 const reserveParams = reactive({
-  campus: '',
   month: date.getMonth() + 1,
   day: date.getDate(),
-  timeslot: [],
-  Cid: '',
-  Cidlist: [],
+  timeslot: '',
   remark: '',
 });
 
@@ -179,7 +169,7 @@ async function getdata() {
 //添加或删除节次
 function changeTimeSlot(value, isRemove = false) {
   if (reserveParams.timeslot.indexOf(value * 1) === -1 && reserveParams.timeslot.length < 3)
-    reserveParams.timeslot.push(value * 1);
+    reserveParams.timeslot.push(value);
   if (isRemove) {
     let index = reserveParams.timeslot.indexOf(value * 1);
     reserveParams.timeslot.splice(index, 1);
@@ -206,16 +196,18 @@ async function getUsableClassroom() {
 }
 
 //增加预约
-async function addReserve() {
-  if (reserveParams.Cid) {
-    const params = { ...reserveParams };
-    const result = await reAddReserveClassroom(params);
-    if (result.code && result.code === 200) {
-      getdata();
-      Bus.$emit('popMes', { type: 'success', text: '添加预约成功' });
-    } else console.log('addReserve-err', result);
-    addReserveShow.value = false;
-  } else Bus.$emit('popMes', { type: 'tip', text: '请选择教室' });
+async function addReserveFn() {
+  const year = date.getFullYear();
+  console.log(
+    `${year}-${reserveParams.month.toString().padStart(2, '0')}-${reserveParams.day.toString().padStart(2, '0')}`,
+  );
+  const res = await addReserve({
+    date: `${year}-${reserveParams.month.toString().padStart(2, '0')}-${reserveParams.day.toString().padStart(2, '0')}`,
+    time: reserveParams.timeslot,
+  });
+  if (res.code == 200) {
+    Bus.$emit('popMes', { type: 'success', text: '添加预约成功' }); // tip success err
+  }
 }
 
 //打开确认删除的窗口

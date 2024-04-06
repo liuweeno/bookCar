@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from '@/utils/token';
 
 const request = axios.create({
-  baseURL: 'http://127.0.0.1:9508/api',
+  baseURL: 'http://101.37.87.187:8081/',
   //baseURL: 'http://39.99.234.229:9508/api',
   timeout: 2000,
 });
@@ -11,7 +11,7 @@ const request = axios.create({
 request.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
-    config.headers.token = token;
+    config.headers.authorization = token;
   }
   return config;
 });

@@ -35,10 +35,15 @@
           <p>
             <i class="iconfont icon-yonghu"></i> <span>{{ userStore.userName }}</span>
           </p>
-          <p><i class="iconfont icon-nan"></i> <span>男</span></p>
-          <p><i class="iconfont icon-shengri"></i> <span>手机号：1770000263</span></p>
-          <p><i class="iconfont icon-dingwei"></i> <span>广东.广州</span></p>
-          <p><i class="iconfont icon-icon-taikong8"> </i><span>身份证：440000200109045000</span></p>
+          <p>
+            <i class="iconfont icon-nan"></i> <span>{{ sex == 0 ? '男' : '女' }}</span>
+          </p>
+          <p>
+            <i class="iconfont icon-shengri"></i> <span>手机号：{{ userStore.phone }}</span>
+          </p>
+          <p>
+            <i class="iconfont icon-icon-taikong8"> </i><span>身份证：{{ userStore.idCard }}</span>
+          </p>
         </div>
       </div>
     </div>
@@ -66,16 +71,6 @@ const openChangePhone = ref(false);
 const openChangeCoachPhone = ref(false);
 const newPhone = ref('');
 
-//获取登录历史
-async function getHistory(page = 1) {
-  const result = await reLogHistory(page);
-  if (result.code && result.code === 200) {
-    data.historyList = result.data.logHistoryList;
-  } else {
-    console.log('err!');
-  }
-}
-
 function handleOk(value) {
   if (value === 'user') {
     console.log('修改用户手机号');
@@ -84,10 +79,6 @@ function handleOk(value) {
   }
   openChangePhone.value = false;
 }
-
-onBeforeMount(() => {
-  getHistory(1);
-});
 </script>
 
 <style lang="less" scoped>

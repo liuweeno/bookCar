@@ -8,7 +8,7 @@ router.beforeEach(async (to, from, next) => {
   NProgress.start();
   document.title = to.meta.title ? to.meta.title + ' - ' + 'Vue Timetable' : 'Vue Timetable';
   if (!userStore.isLogin) {
-    if (to.path === '/login') {
+    if (to.path === '/login' || to.path === '/register' || to.path === '/CarInfo') {
       next();
       NProgress.done();
     } else {

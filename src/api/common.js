@@ -7,7 +7,7 @@ export function reLogin(params) {
 
 //获取用户信息
 export function reUserInfo() {
-  return request.get('/get/userinfo');
+  return request.post('/user/info');
 }
 
 //退出登录

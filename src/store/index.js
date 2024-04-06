@@ -17,12 +17,24 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     async updataUserInfo() {
+      const role = {
+        0: 'student',
+        1: 'teacher',
+        2: 'admin',
+      };
       let info = await reUserInfo();
       if (info.code == 200) {
-        this.role = info.data.role;
-        this.userName = info.data.userName;
+        if (info.data.role == 0) {
+          this.coachPhone = info.data.coachPhone;
+          this.coachNmae = info.data.coachNmae;
+        }
+        this.role = role[info.data.role];
+        this.userName = info.data.realName;
         this.phone = info.data.phone;
-        this.isLogin = info.data.isLogin;
+        this.idCard = info.data.idCard;
+        this.sex = info.data.sex;
+        this.realName = info.data.realName;
+        this.isLogin = true;
         return true;
       } else return false;
     },

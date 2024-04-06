@@ -40,49 +40,6 @@ const welcomeMessage = computed(() => {
   if (hour >= 19 && hour <= 23) return ['🌙晚上好', '累了的话喝杯茶提提神吧。'];
   return [];
 });
-
-//获取我的信息
-async function getMyInfo(num = 5) {
-  const result = await reMyInform(num);
-  if (result.code && result.code === 200) {
-    data.myInfoList = result.data;
-  } else {
-    console.log('err!');
-  }
-}
-//获取公告
-async function getnotice(num = 5) {
-  const result = await reGetNotice(num);
-  if (result.code && result.code === 200) {
-    data.noticeList = result.data;
-  } else {
-    console.log('err!');
-  }
-}
-//获取最近安排
-async function getMyArrange(num = 5) {
-  const result = await reMyArrange(num);
-  if (result.code && result.code === 200) {
-    data.myArrange = result.data;
-  } else {
-    console.log('err!');
-  }
-}
-//获取教室预约列表
-async function getRoomList(num = 7) {
-  const result = await reReserveClassroom();
-  if (result.code && result.code == 200) {
-    if (result.data.length < num) data.roomList = result.data;
-    else data.roomList = result.data.slice(0, num);
-  } else console.log('err', result);
-}
-
-onBeforeMount(() => {
-  getMyInfo(5);
-  getnotice(5);
-  getMyArrange(4);
-  getRoomList(7);
-});
 </script>
 
 <style lang="less" scoped>

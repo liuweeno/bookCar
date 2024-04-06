@@ -25,6 +25,12 @@ const routes = [
     meta: { hideInMenu: true },
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/register/Register.vue'),
+    meta: { hideInMenu: true },
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/homepage',

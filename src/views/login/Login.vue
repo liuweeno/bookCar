@@ -6,7 +6,7 @@
       <!-- 输入 -->
       <div class="input-wrapper">
         <i class="iconfont icon-user-filling icon"></i>
-        <input placeholder="请输入账号" v-model="logindata.account" />
+        <input placeholder="请输入手机号" v-model="logindata.phone" />
       </div>
       <div class="input-wrapper">
         <i class="iconfont icon-lock icon"></i>
@@ -25,6 +25,7 @@
       </div>
 
       <button class="loginbt" @click="loginHandle">登 录</button>
+      <div><span class="register" @click="goRegister">注册</span></div>
     </div>
   </div>
 </template>
@@ -33,7 +34,9 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store';
-import { reLogin } from '@/api/common.js';
+import { login } from '@/api/user.js';
+import { setToken } from '@/utils/token.js';
+import { reLogin } from '@/api/common';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -42,9 +45,8 @@ const passwordInput = ref();
 const iconHide = ref();
 
 const logindata = reactive({
-  account: 'admin',
+  phone: '17748690265',
   password: '123456',
-  role: 'student',
 });
 
 //改变密码显示状态
@@ -56,14 +58,27 @@ function changPasswordShow() {
 
 //处理登录请求
 async function loginHandle() {
-  const params = { ...logindata };
-  const result = await reLogin(params);
-  if (result.code && result.code === 200) {
-    userStore.updataToken(result.data.token);
-    let result2 = await userStore.updataUserInfo();
-    if (result2) router.push('/');
+  const res = await login(logindata);
+  if (res?.code !== 200) {
+    return;
   }
+  userStore.updataToken(res.data);
+  let result2 = await userStore.updataUserInfo();
+  if (result2) router.push('/');
 }
+// async function loginHandle() {
+//   const params = { ...logindata };
+//   const result = await reLogin(params);
+//   if (result.code && result.code === 200) {
+//     userStore.updataToken(result.data.token);
+//     let result2 = await userStore.updataUserInfo();
+//     if (result2) router.push('/');
+//   }
+// }
+
+const goRegister = () => {
+  router.push('/register');
+};
 </script>
 
 <style lang="less" scoped>
@@ -193,6 +208,15 @@ async function loginHandle() {
 
       &:hover {
         background-color: rgb(142, 190, 138);
+      }
+    }
+
+    .register {
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover {
+        color: rgb(142, 190, 138);
       }
     }
   }
