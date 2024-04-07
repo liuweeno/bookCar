@@ -7,20 +7,20 @@
             <i class="iconfont icon-shouji"></i>
           </span>
           <span class="bind-text">
-            <h3>绑定手机</h3>
-            <p>未绑定</p>
+            <h3>更改绑定手机</h3>
+            <p>{{ userStore.phone }}</p>
           </span>
-          <button class="change-bt phone" @click="openChangePhone = true">更改手机</button>
+          <button class="change-bt phone" @click="openChangePhone = true">更改绑定手机</button>
         </div>
         <div class="appblock top">
-          <span class="icon-wrap phone">
-            <i class="iconfont icon-shouji"></i>
+          <span class="icon-wrap coachPhone">
+            <ContactsOutlined />
           </span>
           <span class="bind-text">
             <h3>更改教练手机号</h3>
-            <p>未绑定</p>
+            <p>{{ userStore.coachPhone === null ? '未绑定' : userStore.coachPhone }}</p>
           </span>
-          <button class="change-bt phone" @click="openChangeCoachPhone = true">更改教练手机号</button>
+          <button class="change-bt coachPhone" @click="openChangeCoachPhone = true">更改教练手机号</button>
         </div>
       </div>
 
@@ -51,7 +51,7 @@
       <a-input v-model:value="newPhone" placeholder="输入修改后的手机号" />
     </a-modal>
     <a-modal v-model:open="openChangeCoachPhone" cancelText="取消" title="修改教练手机号" @ok="handleOk('coach')">
-      <a-input v-model:value="newPhone" placeholder="输入修改后的手机号" />
+      <a-input v-model:value="newCoachPhone" placeholder="输入修改后的手机号" />
     </a-modal>
   </div>
 </template>
@@ -61,6 +61,9 @@ import { useUserStore } from '@/store';
 import { reactive, onBeforeMount, ref } from 'vue';
 import { reLogHistory } from '@/api/common.js';
 import { useRouter } from 'vue-router';
+import { ContactsOutlined } from '@ant-design/icons-vue';
+import { bindCoach } from '@/api/student.js';
+import Bus from '@/utils/bus';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -70,12 +73,26 @@ const data = reactive({
 const openChangePhone = ref(false);
 const openChangeCoachPhone = ref(false);
 const newPhone = ref('');
+const newCoachPhone = ref('');
 
-function handleOk(value) {
+async function handleOk(value) {
   if (value === 'user') {
     console.log('修改用户手机号');
   } else {
     console.log('修改教练手机号');
+    const res = await bindCoach({
+      coachPhone: newCoachPhone.value,
+    });
+    if (res && res.code === 200) {
+      userStore.coachPhone = newCoachPhone.value;
+      openChangeCoachPhone.value = false;
+      newCoachPhone.value = '';
+      Bus.$emit('popMes', { type: 'success', text: '修改教练手机号成功' }); // tip success err
+    } else {
+      openChangeCoachPhone.value = false;
+      newCoachPhone.value = '';
+      Bus.$emit('popMes', { type: 'err', text: '修改教练手机号失败' }); // tip success err
+    }
   }
   openChangePhone.value = false;
 }
@@ -170,5 +187,9 @@ function handleOk(value) {
       }
     }
   }
+}
+
+.coachPhone {
+  background-color: #108ee9 !important;
 }
 </style>

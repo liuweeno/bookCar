@@ -18,25 +18,12 @@
         </tr>
         <tr v-for="item in orderList.list" :key="item.id">
           <td>{{ item.date }}</td>
-          <td>{{ areaMap[item.area] }}</td>
-          <td>{{ item.Cid }}</td>
+          <td>{{ timeShow[item.time] }}</td>
+          <td>{{ userStore.coachName === null ? '未绑定教练' : userStore.coachName }}</td>
           <td class="time-slot">
-            <span v-for="i in item.timeSlot" class="timeslot-span" :key="i">{{ i }}</span>
+            {{ approveShow[item.approve] }}
           </td>
           <td>
-            <span
-              class="check"
-              :class="{
-                'check-true': item.check == 'true',
-                'check-false': item.check == 'false',
-                'check-wait': item.check == 'wait',
-              }"
-            >
-              {{ checkMap[item.check] }}
-            </span>
-          </td>
-          <td>
-            <i class="detail-bt" @click="getDetail(item.id)">详情</i>
             <i class="remove-bt" @click="showRemove(item.id)">删除</i>
           </td>
         </tr>
@@ -79,7 +66,7 @@
         <!-- 因为v-show的关系?，此元素就算放v-for="item in roomList.list"的元素中，也取不到正确的item值，所以放在这里 -->
         <div class="mesbox">
           <p class="title">确认删除</p>
-          <i class="comfirm-bt" @click="removeReserve()">确认</i>
+          <i class="comfirm-bt" @click="removeReserveFn()">确认</i>
           <i class="cancel-bt" @click="removeReserveShow = false">取消</i>
         </div>
       </div>
@@ -116,7 +103,10 @@ import SelectBlock from '@/components/SelectBlock.vue';
 import { useRoute } from 'vue-router';
 import Bus from '@/utils/bus';
 import { addReserve } from '@/api/student.js';
+import { getReserveList, removeReserve } from '@/api/student.js';
+import { useUserStore } from '@/store';
 
+const userStore = useUserStore();
 const route = useRoute();
 const date = new Date();
 //获取输入年月的天数
@@ -141,12 +131,14 @@ const checkMap = {
   true: '审核通过',
   false: '审核未通过',
 };
+const timeShow = ['上午', '下午', '晚上'];
+const approveShow = ['等待审批', '审批通过', '拒绝预约'];
 
 const addReserveShow = ref(false);
 const removeReserveShow = ref(false);
 const detailShow = ref(false);
 const reserveDetail = ref(null);
-let deleteId = null;
+let deleteId = ref(null);
 let forbidWatchMonth = false;
 const orderList = reactive({
   list: [],
@@ -160,10 +152,10 @@ const reserveParams = reactive({
 
 //获取预约信息
 async function getdata() {
-  // const result = await reReserveClassroom();
-  // if (result.code && result.code === 200) {
-  //     roomList.list = result.data;
-  // } else console.log("err", result);
+  const result = await getReserveList();
+  if (result.code && result.code === 200) {
+    orderList.list = result.data;
+  } else console.log('err', result);
 }
 
 //添加或删除节次
@@ -176,25 +168,6 @@ function changeTimeSlot(value, isRemove = false) {
   }
   getUsableClassroom();
 }
-
-//获取可用教室列表
-async function getUsableClassroom() {
-  reserveParams.Cidlist = [];
-  reserveParams.Cid = '';
-  if (reserveParams.campus && reserveParams.month && reserveParams.day && reserveParams.timeslot.length > 0) {
-    const params = {
-      month: reserveParams.month,
-      day: reserveParams.day,
-      area: reserveParams.campus,
-      timeslot: reserveParams.timeslot,
-    };
-    const result = await reUsableClassroom(params);
-    if (result.code && result.code === 200) {
-      reserveParams.Cidlist = result.data.Cidlist;
-    } else console.log(result);
-  }
-}
-
 //增加预约
 async function addReserveFn() {
   const year = date.getFullYear();
@@ -207,6 +180,8 @@ async function addReserveFn() {
   });
   if (res.code == 200) {
     Bus.$emit('popMes', { type: 'success', text: '添加预约成功' }); // tip success err
+    addReserveShow.value = false;
+    getdata();
   }
 }
 
@@ -216,9 +191,8 @@ function showRemove(id) {
   deleteId = id;
 }
 //删除元素
-async function removeReserve() {
-  if (!deleteId) return console.log('删除元素id错误');
-  const result = await reDeleteReserve(deleteId);
+async function removeReserveFn() {
+  const result = await removeReserve({ id: deleteId });
   if (result.code && result.code === 200) {
     getdata();
     Bus.$emit('popMes', { type: 'success', text: '删除成功' });
@@ -253,16 +227,6 @@ watch(
 
 onBeforeMount(() => {
   getdata();
-  //如果是从教室查询页面的预约功能进入此页面，则打开预约页面
-  if (route.params.Cid) {
-    addReserveShow.value = true;
-    forbidWatchMonth = true;
-    reserveParams.campus = route.params.campus;
-    reserveParams.month = route.params.month;
-    reserveParams.day = route.params.day;
-    reserveParams.timeslot.push(route.params.timeSlot[0] * 1);
-    reserveParams.Cid = route.params.Cid;
-  }
 });
 </script>
 
@@ -277,6 +241,7 @@ onBeforeMount(() => {
 }
 
 .reserve-bt {
+  margin-bottom: 10px;
   padding: 10px 20px;
   background-color: @theme-main-color1;
   color: white;

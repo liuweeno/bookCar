@@ -26,7 +26,7 @@ export const useUserStore = defineStore('user', {
       if (info.code == 200) {
         if (info.data.role == 0) {
           this.coachPhone = info.data.coachPhone;
-          this.coachNmae = info.data.coachNmae;
+          this.coachName = info.data.coachName;
         }
         this.role = role[info.data.role];
         this.userName = info.data.realName;
