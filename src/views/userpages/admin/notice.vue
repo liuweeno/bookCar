@@ -1,84 +1,85 @@
 <template>
-  <div class="carInfo">
-    {{ editableData }}
-    <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加新的公告</a-button>
-    <a-table :columns="columns" :data-source="dataSource" bordered>
-      <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
-        <div style="padding: 8px">
-          <a-input
-            ref="searchInput"
-            :placeholder="`Search ${column.dataIndex}`"
-            :value="selectedKeys[0]"
-            style="width: 188px; margin-bottom: 8px; display: block"
-            @change="(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])"
-            @pressEnter="handleSearch(selectedKeys, confirm, column.dataIndex)"
-          />
-          <a-button
-            type="primary"
-            size="small"
-            style="width: 90px; margin-right: 8px"
-            @click="handleSearch(selectedKeys, confirm, column.dataIndex)"
-          >
-            <template #icon><SearchOutlined /></template>
-            Search
-          </a-button>
-          <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)"> Reset </a-button>
-        </div>
-      </template>
-      <template #customFilterIcon="{ filtered }">
-        <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
-      </template>
-      <template #bodyCell="{ column, text, record }">
-        <template v-if="['title', 'content'].includes(column.dataIndex)">
-          <div>
+  <div class="appmain">
+    <div class="carInfo">
+      <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加新的公告</a-button>
+      <a-table :columns="columns" :data-source="dataSource" bordered>
+        <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
+          <div style="padding: 8px">
             <a-input
-              v-if="editableData[record.id]"
-              v-model:value="editableData[record.id][column.dataIndex]"
-              style="margin: -5px 0"
+              ref="searchInput"
+              :placeholder="`Search ${column.dataIndex}`"
+              :value="selectedKeys[0]"
+              style="width: 188px; margin-bottom: 8px; display: block"
+              @change="(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])"
+              @pressEnter="handleSearch(selectedKeys, confirm, column.dataIndex)"
             />
-            <template v-else>
-              {{ text }}
-            </template>
+            <a-button
+              type="primary"
+              size="small"
+              style="width: 90px; margin-right: 8px"
+              @click="handleSearch(selectedKeys, confirm, column.dataIndex)"
+            >
+              <template #icon><SearchOutlined /></template>
+              Search
+            </a-button>
+            <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)"> Reset </a-button>
           </div>
         </template>
-        <template v-else-if="column.dataIndex === 'operation'">
-          <div class="editable-row-operations">
-            <span v-if="editableData[record.id]">
-              <a-typography-link @click="save(record.id)">Save</a-typography-link>
-              <a-popconfirm title="Sure to cancel?" @confirm="cancel(record.id)">
-                <a>Cancel</a>
-              </a-popconfirm>
-            </span>
-            <span v-else>
-              <a @click="edit(record.id)">修改</a>
-            </span>
-          </div>
+        <template #customFilterIcon="{ filtered }">
+          <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
         </template>
-      </template>
-    </a-table>
+        <template #bodyCell="{ column, text, record }">
+          <template v-if="['title', 'content'].includes(column.dataIndex)">
+            <div>
+              <a-input
+                v-if="editableData[record.id]"
+                v-model:value="editableData[record.id][column.dataIndex]"
+                style="margin: -5px 0"
+              />
+              <template v-else>
+                {{ text }}
+              </template>
+            </div>
+          </template>
+          <template v-else-if="column.dataIndex === 'operation'">
+            <div class="editable-row-operations">
+              <span v-if="editableData[record.id]">
+                <a-typography-link @click="save(record.id)">Save</a-typography-link>
+                <a-popconfirm title="Sure to cancel?" @confirm="cancel(record.id)">
+                  <a>Cancel</a>
+                </a-popconfirm>
+              </span>
+              <span v-else>
+                <a @click="edit(record.id)">修改</a>
+              </span>
+            </div>
+          </template>
+        </template>
+      </a-table>
+    </div>
+    <a-modal v-model:open="showAddModal" title="添加新的公告" @ok="confirmAdd">
+      <a-form
+        :model="newNoticeForm"
+        name="basic"
+        :label-col="{ span: 8 }"
+        :wrapper-col="{ span: 16 }"
+        autocomplete="off"
+        @finish="onFinish"
+        @finishFailed="onFinishFailed"
+        centered="true"
+      >
+        <a-form-item label="公告标题" name="title">
+          <a-input v-model:value="newNoticeForm.title" />
+        </a-form-item>
+        <a-form-item label="公告内容" name="text">
+          <a-textarea :rows="4" placeholder="maxlength is 6" :maxlength="600" v-model:value="newNoticeForm.text" />
+        </a-form-item>
+        <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+          <a-button type="primary" html-type="submit">Submit</a-button>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
-  <a-modal v-model:open="showAddModal" title="添加新的公告" @ok="confirmAdd">
-    <a-form
-      :model="newNoticeForm"
-      name="basic"
-      :label-col="{ span: 8 }"
-      :wrapper-col="{ span: 16 }"
-      autocomplete="off"
-      @finish="onFinish"
-      @finishFailed="onFinishFailed"
-      centered="true"
-    >
-      <a-form-item label="公告标题" name="title">
-        <a-input v-model:value="newNoticeForm.title" />
-      </a-form-item>
-      <a-form-item label="公告内容" name="text">
-        <a-textarea :rows="4" placeholder="maxlength is 6" :maxlength="600" v-model:value="newNoticeForm.text" />
-      </a-form-item>
-      <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
-        <a-button type="primary" html-type="submit">Submit</a-button>
-      </a-form-item>
-    </a-form>
-  </a-modal>
 </template>
 
 <script setup>
