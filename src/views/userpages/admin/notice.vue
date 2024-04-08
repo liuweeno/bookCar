@@ -1,7 +1,7 @@
 <template>
   <div class="carInfo">
     {{ editableData }}
-    <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加新的汽车</a-button>
+    <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加新的公告</a-button>
     <a-table :columns="columns" :data-source="dataSource" bordered>
       <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
         <div style="padding: 8px">
@@ -29,7 +29,7 @@
         <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
       </template>
       <template #bodyCell="{ column, text, record }">
-        <template v-if="['ownerPhone', 'ownerName'].includes(column.dataIndex)">
+        <template v-if="['title', 'content'].includes(column.dataIndex)">
           <div>
             <a-input
               v-if="editableData[record.id]"
@@ -57,9 +57,9 @@
       </template>
     </a-table>
   </div>
-  <a-modal v-model:open="showAddModal" title="添加新的汽车" @ok="confirmAdd">
+  <a-modal v-model:open="showAddModal" title="添加新的公告" @ok="confirmAdd">
     <a-form
-      :model="newCarForm"
+      :model="newNoticeForm"
       name="basic"
       :label-col="{ span: 8 }"
       :wrapper-col="{ span: 16 }"
@@ -68,21 +68,11 @@
       @finishFailed="onFinishFailed"
       centered="true"
     >
-      <a-form-item label="汽车品牌" name="brand" :rules="[{ required: true, message: 'Please input your username!' }]">
-        <a-input v-model:value="newCarForm.brand" />
+      <a-form-item label="公告标题" name="title">
+        <a-input v-model:value="newNoticeForm.title" />
       </a-form-item>
-      <a-form-item label="型号" name="model" :rules="[{ required: true, message: 'Please input your username!' }]">
-        <a-input v-model:value="newCarForm.model" />
-      </a-form-item>
-      <a-form-item label="车牌号" name="plate" :rules="[{ required: true, message: 'Please input your username!' }]">
-        <a-input v-model:value="newCarForm.plate" />
-      </a-form-item>
-      <a-form-item
-        label="持有者手机号"
-        name="ownerPhone"
-        :rules="[{ required: true, message: 'Please input your username!' }]"
-      >
-        <a-input v-model:value="newCarForm.ownerPhone" />
+      <a-form-item label="公告内容" name="text">
+        <a-textarea :rows="4" placeholder="maxlength is 6" :maxlength="600" v-model:value="newNoticeForm.text" />
       </a-form-item>
       <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
         <a-button type="primary" html-type="submit">Submit</a-button>
@@ -95,48 +85,22 @@
 import { reactive, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 import { onMounted } from 'vue';
-import { getAllCar, addNewCar, editCarInfo } from '@/api/admin.js';
+import { addNotice, editNotice, editCarInfo } from '@/api/admin.js';
 import Bus from '@/utils/bus';
 import { SearchOutlined } from '@ant-design/icons-vue';
+import { getNotice } from '@/api/user';
 
 const searchInput = ref();
 const columns = [
   {
-    id: 'id',
-    title: '车辆信息ID',
-    dataIndex: 'id',
+    id: 'title',
+    title: '题目',
+    dataIndex: 'title',
   },
   {
-    id: 'brand',
-    title: '品牌',
-    dataIndex: 'brand',
-  },
-  {
-    id: 'model',
-    title: '型号',
-    dataIndex: 'model',
-  },
-  {
-    id: 'plate',
-    title: '车牌号',
-    dataIndex: 'plate',
-    customFilterDropdown: true,
-    onFilter: (value, record) => {
-      return record.plate.toString().toLowerCase().includes(value.toLowerCase());
-    },
-    onFilterDropdownOpenChange: (visible) => {
-      console.log(3, visible);
-      if (visible) {
-        setTimeout(() => {
-          searchInput.value.focus();
-        }, 100);
-      }
-    },
-  },
-  {
-    id: 'ownerPhone',
-    title: '拥有者手机号',
-    dataIndex: 'ownerPhone',
+    id: 'content',
+    title: '内容',
+    dataIndex: 'content',
     customFilterDropdown: true,
     onFilter: (value, record) => {
       return record.ownerPhone.toString().toLowerCase().includes(value.toLowerCase());
@@ -151,11 +115,6 @@ const columns = [
     },
   },
   {
-    id: 'ownerName',
-    title: '持有者姓名',
-    dataIndex: 'ownerName',
-  },
-  {
     id: 'operation',
     title: 'operation',
     dataIndex: 'operation',
@@ -164,11 +123,9 @@ const columns = [
 const dataSource = ref([]);
 const editableData = reactive({});
 const showAddModal = ref(false);
-const newCarForm = reactive({
-  brand: '',
-  model: '',
-  plate: '',
-  ownerPhone: '',
+const newNoticeForm = reactive({
+  title: '',
+  text: '',
 });
 const state = reactive({
   searchText: '',
@@ -182,11 +139,11 @@ const save = async (key) => {
   console.log('当前的key', key);
   Object.assign(dataSource.value.filter((item) => key === item.id)[0], editableData[key]);
   // TODO 测试是否可以修改成功
-  const res = await editCarInfo({ id: key, ownerPhone: editableData[key].ownerPhone });
+  const res = await editNotice({ id: key, title: editableData[key].title, text: editableData[key].content });
   if (res.code === 200) {
-    Bus.$emit('popMes', { type: 'success', text: '修改车辆信息成功' }); // tip success err
+    Bus.$emit('popMes', { type: 'success', text: '修改公告信息成功' }); // tip success err
   } else {
-    Bus.$emit('popMes', { type: 'err', text: '修改车辆信息失败' }); // tip success err
+    Bus.$emit('popMes', { type: 'err', text: '修改公告信息失败' }); // tip success err
   }
   delete editableData[key];
 };
@@ -213,26 +170,25 @@ const confirmAdd = () => {
 };
 
 async function onFinish() {
-  const res = await addNewCar(newCarForm);
+  const res = await addNotice(newNoticeForm);
   console.log(res);
   if (res.code == 200) {
-    Bus.$emit('popMes', { type: 'success', text: '添加车辆成功' }); // tip success err
+    Bus.$emit('popMes', { type: 'success', text: '添加公告成功' }); // tip success err
     await getData();
   } else {
-    Bus.$emit('popMes', { type: 'err', text: '添加车辆失败' }); // tip success err
+    Bus.$emit('popMes', { type: 'err', text: '添加公告失败' }); // tip success err
   }
   showAddModal.value = false;
 }
 
 async function getData() {
-  const res = await getAllCar().then((res) => {
+  const res = await getNotice().then((res) => {
     dataSource.value = res.data;
   });
   console.log(res);
 }
 
 onMounted(() => {
-  console.log('CarInfo mounted');
   getData();
 });
 </script>

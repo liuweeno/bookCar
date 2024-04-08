@@ -9,14 +9,14 @@
           <th>时期</th>
           <th>具体时间段</th>
         </tr>
-        <tr v-show="data.courseList.length == 0">
+        <tr v-show="data.studentOrderList === []">
           <td class="nodata" colspan="6">No Data</td>
         </tr>
-        <tr v-for="item in data.courseList" :key="item.id">
-          <td>{{ item.courseName }}</td>
-          <td>{{ item.teacher }}</td>
-          <td>{{ item.timeslot }}</td>
-          <td>{{ item.classroom }}</td>
+        <tr v-for="item in data.studentOrderList" :key="item.id">
+          <td>{{ item.studentName }}</td>
+          <td>{{ item.studentPhone }}</td>
+          <td>{{ item.date }}</td>
+          <td>{{ timeShow[item.time] }}</td>
         </tr>
       </table>
     </div>
@@ -36,20 +36,23 @@ import { onBeforeMount, reactive } from 'vue';
 import { reSelectCourse, reSelectOrCancelCourse } from '@/api/user.js';
 import { useRouter } from 'vue-router';
 import Bus from '@/utils/bus';
+import { getStudentOrder } from '@/api/coach';
 
 const router = useRouter();
-
 const data = reactive({
   courseList: [],
   maskShow: false,
-  toBeCancel: null,
 });
-
+const timeShow = ['上午', '下午', '晚上'];
 //获取课程数据
 async function updataData() {
-  const result = await reSelectCourse();
-  if (result.code && result.code == 200) {
-    data.courseList = result.data;
+  const result = await getStudentOrder();
+  if (result.code && result.code === 200) {
+    data.studentOrderList = result.data.filter((item, index) => {
+      console.log(index, item);
+      return item.approve == 1;
+    });
+    console.log(data.studentOrderList);
   } else console.log('err', result);
 }
 

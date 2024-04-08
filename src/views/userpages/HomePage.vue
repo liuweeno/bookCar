@@ -1,5 +1,22 @@
 <template>
   <div class="appmain">
+    <div class="carousel">
+      <a-carousel :after-change="onChange" autoplay arrows>
+        <template #prevArrow>
+          <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
+            <left-circle-outlined />
+          </div>
+        </template>
+        <template #nextArrow>
+          <div class="custom-slick-arrow" style="right: 10px">
+            <right-circle-outlined />
+          </div>
+        </template>
+        <div v-for="item in noticeList">
+          <a-card :loading="loading" :title="item.title">{{ item.content }}</a-card>
+        </div>
+      </a-carousel>
+    </div>
     <div class="appcart welcome-wrap">
       <img src="@/assets/imgs/head_portrait.jpg" class="user-head-icon" />
       <span class="text-wrap">
@@ -11,9 +28,11 @@
 </template>
 
 <script setup>
-import { reactive, computed, onBeforeMount } from 'vue';
+import { reactive, computed, onBeforeMount, ref } from 'vue';
 import { useUserStore } from '@/store';
 import { reMyInform, reGetNotice, reMyArrange, reReserveClassroom } from '@/api/common.js';
+import { leftCircleOutlined, rightCircleOutlined } from '@ant-design/icons-vue';
+import { getNotice } from '@/api/user';
 
 const userStore = useUserStore();
 const date = new Date();
@@ -30,6 +49,18 @@ const data = reactive({
   myArrange: [],
   roomList: [],
 });
+const noticeList = ref([
+  {
+    title: '通知标题1',
+    content: '通知内容1',
+    date: '2021-08-01',
+  },
+  {
+    title: '通知标题2',
+    content: '通知内容2',
+    date: '2021-08-01',
+  },
+]);
 
 const welcomeMessage = computed(() => {
   let hour = date.getHours();
@@ -40,9 +71,37 @@ const welcomeMessage = computed(() => {
   if (hour >= 19 && hour <= 23) return ['🌙晚上好', '累了的话喝杯茶提提神吧。'];
   return [];
 });
+
+onBeforeMount(async () => {
+  const res = await getNotice();
+  if (res.code === 200) {
+    noticeList.value = res.data;
+  }
+});
+const onChange = (current) => {
+  console.log(current);
+};
 </script>
 
 <style lang="less" scoped>
+:deep(.slick-slide) {
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+:deep(.slick-slide h3) {
+  color: red;
+}
+
+.carousel {
+  width: 60%;
+  margin: 0 12px;
+
+  > div {
+    width: 100%;
+  }
+}
+
 .welcome-wrap {
   position: relative;
   overflow: hidden;

@@ -1,7 +1,7 @@
 <template>
   <div class="register">
-    <h1>注册</h1>
     <div class="registerForm">
+      <h1>学员注册</h1>
       <a-form
         ref="formRef"
         name="custom-validation"
@@ -12,27 +12,29 @@
         @validate="handleValidate"
         @finishFailed="handleFinishFailed"
       >
-        <a-form-item has-feedback label="Phone" name="phone">
+        <a-form-item has-feedback label="手机号" name="phone">
           <a-input v-model:value="registerForm.phone" autocomplete="off" />
         </a-form-item>
-        <a-form-item has-feedback label="Password" name="password">
+        <a-form-item has-feedback label="密码" name="password">
           <a-input v-model:value="registerForm.password" type="password" autocomplete="off" />
         </a-form-item>
         <!--        <a-form-item has-feedback label="Confirm" name="checkPass">-->
         <!--          <a-input v-model:value="registerForm.checkPass" type="password" autocomplete="off" />-->
         <!--        </a-form-item>-->
-        <a-form-item has-feedback label="Sex" name="sex">
-          <a-input v-model:value="registerForm.sex" autocomplete="off" />
+        <a-form-item has-feedback label="性别" name="sex">
+          <a-radio-group v-model:value="registerForm.sex" name="radioGroup">
+            <a-radio value="0">男</a-radio>
+            <a-radio value="1">女</a-radio>
+          </a-radio-group>
         </a-form-item>
-        <a-form-item has-feedback label="ID Card" name="idCard">
+        <a-form-item has-feedback label="身份证" name="idCard">
           <a-input v-model:value="registerForm.idCard" autocomplete="off" />
         </a-form-item>
-        <a-form-item has-feedback label="Real Name" name="realName">
+        <a-form-item has-feedback label="实名" name="realName">
           <a-input v-model:value="registerForm.realName" autocomplete="off" />
         </a-form-item>
         <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
           <a-button type="primary" html-type="submit">确认注册</a-button>
-          <a-button style="margin-left: 10px" @click="resetForm">Reset</a-button>
         </a-form-item>
       </a-form>
     </div>
@@ -117,6 +119,7 @@ const handleFinish = async (values) => {
   const res = await register({ phone, password, sex, idCard, realName });
   if (res.code === 200) {
     alert('注册成功');
+    router.push('/login');
   } else {
     alert('注册失败');
   }
@@ -134,13 +137,25 @@ const handleValidate = (...args) => {
 
 <style lang="less" scoped>
 .register {
-  .flex-mode(column);
+  background-image: url('@/assets/imgs/login_back.jpg');
+  background-position: center;
+  background-size: cover;
+  .flex-mode;
   width: 100%;
-  height: 100%;
+  height: 100vh;
 
   .registerForm {
+    border-radius: 10px;
+    color: white;
+    background-color: rgba(100, 100, 100, 0.25);
+    backdrop-filter: blur(8px);
     width: 60%;
-    height: 80%;
+
+    > h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 24px;
+    }
   }
 }
 </style>

@@ -14,16 +14,6 @@
         <i class="iconfont icon-hide icon" @click="changPasswordShow" ref="iconHide"></i>
       </div>
 
-      <!-- 角色选择 -->
-      <div class="role-wrap">
-        <input type="radio" id="student" value="student" v-model="logindata.role" />
-        <label for="student">学员</label>
-        <input type="radio" id="teacher" value="teacher" v-model="logindata.role" />
-        <label for="teacher">教练</label>
-        <input type="radio" id="admin" value="admin" v-model="logindata.role" />
-        <label for="admin">管理员</label>
-      </div>
-
       <button class="loginbt" @click="loginHandle">登 录</button>
       <div><span class="register" @click="goRegister">注册</span></div>
     </div>

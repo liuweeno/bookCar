@@ -11,17 +11,18 @@
           <th>审核状态</th>
           <th>操作</th>
         </tr>
-        <tr v-show="data.courseList.length == 0">
+        <tr v-show="data.studentOrderList.length == 0">
           <td class="nodata" colspan="6">No Data</td>
         </tr>
-        <tr v-for="item in data.courseList" :key="item.id">
-          <td>{{ item.courseName }}</td>
-          <td>{{ item.teacher }}</td>
-          <td>{{ item.timeslot }}</td>
-          <td>{{ item.classroom }}</td>
-          <td>{{ item.credit }}</td>
+        <tr v-for="item in data.studentOrderList" :key="item.id">
+          <td>{{ item.studentName }}</td>
+          <td>{{ item.studentPhone }}</td>
+          <td>{{ item.date }}</td>
+          <td>{{ timeShow[item.time] }}</td>
+          <td>{{ approveShow[item.approve] }}</td>
           <td>
-            <i class="iconfont icon-zengjia1" :class="{ 'bt-active': !item.isSelect }" @click="confirmSelect(item)"></i>
+            <a-button type="primary" class="accept-btn" @click="confirmSelect(item.id, 1)">通过</a-button>
+            <a-button type="primary" danger class="reject-btn" @click="confirmSelect(item.id, 2)">拒绝</a-button>
           </td>
         </tr>
       </table>
@@ -29,8 +30,8 @@
 
     <div class="appmask" v-show="data.maskShow">
       <div class="mesbox">
-        <p class="title">确认选择</p>
-        <i class="comfirm-bt" @click="addCourse()">确认</i>
+        <p class="title">进行{{ data.type === 1 ? '通过' : '拒绝' }}审批</p>
+        <i class="comfirm-bt" @click="acceptOrder()">确认</i>
         <i class="cancel-bt" @click="data.maskShow = false">取消</i>
       </div>
     </div>
@@ -42,45 +43,63 @@ import { onBeforeMount, reactive } from 'vue';
 import { reOptionCourse, reSelectOrCancelCourse } from '@/api/user.js';
 import SelectBlock from '@/components/SelectBlock.vue';
 import Bus from '@/utils/bus';
+import { getStudentOrder, confirmApprove } from '@/api/coach.js';
 
+const approveShow = ['等待审批', '审批通过', '拒绝预约'];
+const timeShow = ['上午', '下午', '晚上'];
 const data = reactive({
-  courseList: [],
-  semester: '第一学期',
+  studentOrderList: [
+    {
+      studentName: '张三',
+      studentPhone: '12345678901',
+      date: '2021-10-10',
+      time: 1,
+      approve: 0,
+    },
+  ],
   maskShow: false,
-  toBeSelect: null,
+  choseId: '',
+  type: 1,
 });
 
 //获取课程数据
 async function updataData() {
-  const result = await reOptionCourse();
+  const result = await getStudentOrder();
   if (result.code && result.code === 200) {
-    data.courseList = result.data;
+    data.studentOrderList = result.data;
   } else console.log('err', result);
 }
 
 //确认选择
-function confirmSelect(item) {
-  if (item.isSelect) {
-    Bus.$emit('popMes', { type: 'tip', text: '此课程已选择' });
-    return;
-  }
+async function confirmSelect(id, type) {
   data.maskShow = true;
-  data.toBeSelect = item.courseName;
+  data.choseId = id;
+  data.type = type;
 }
 
 //选择课程
-async function addCourse() {
-  const result = await reSelectOrCancelCourse({
-    action: 'select',
-    courseName: data.toBeSelect,
-  });
-  data.toBeSelect = null;
-  data.maskShow = false;
-  if (result.code && result.code === 200) {
-    Bus.$emit('popMes', { type: 'success', text: '选课成功' });
+async function acceptOrder() {
+  const request = {
+    id: data.choseId,
+    approval: data.type,
+  };
+  const res = await confirmApprove(request);
+  if (res?.code && res.code === 200) {
+    Bus.$emit('popMes', { type: 'success', text: '审批成功' });
+    data.maskShow = false;
+    data.choseId = '';
     updataData();
-  } else console.log('err', result);
+  } else {
+    data.maskShow = false;
+    data.choseId = '';
+    Bus.$emit('popMes', { type: 'err', text: '审批失败' });
+  }
 }
+
+// function rejectOrder() {
+//   data.maskShow = false;
+//   data.choseId = '';
+// }
 
 onBeforeMount(() => {
   updataData();
@@ -122,5 +141,18 @@ onBeforeMount(() => {
   tr:hover {
     background-color: rgb(241, 241, 241);
   }
+
+  .accept-btn {
+    background-color: @theme-main-color1 !important;
+    margin-right: 8px;
+  }
+
+  .reject-btn {
+    background-color: palevioletred !important;
+  }
+}
+
+.reject-btn {
+  background-color: palevioletred !important;
 }
 </style>

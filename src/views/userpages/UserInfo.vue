@@ -12,7 +12,7 @@
           </span>
           <button class="change-bt phone" @click="openChangePhone = true">更改绑定手机</button>
         </div>
-        <div class="appblock top">
+        <div class="appblock top" v-if="userStore.role === 'student'">
           <span class="icon-wrap coachPhone">
             <ContactsOutlined />
           </span>
@@ -39,7 +39,7 @@
             <i class="iconfont icon-nan"></i> <span>{{ sex == 0 ? '男' : '女' }}</span>
           </p>
           <p>
-            <i class="iconfont icon-shengri"></i> <span>手机号：{{ userStore.phone }}</span>
+            <PhoneOutlined /> <span>手机号：{{ userStore.phone }}</span>
           </p>
           <p>
             <i class="iconfont icon-icon-taikong8"> </i><span>身份证：{{ userStore.idCard }}</span>
@@ -64,6 +64,7 @@ import { useRouter } from 'vue-router';
 import { ContactsOutlined } from '@ant-design/icons-vue';
 import { bindCoach } from '@/api/student.js';
 import Bus from '@/utils/bus';
+import { PhoneOutlined } from '@ant-design/icons-vue';
 
 const userStore = useUserStore();
 const router = useRouter();
