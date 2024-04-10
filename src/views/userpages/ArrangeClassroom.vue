@@ -24,7 +24,8 @@
             {{ approveShow[item.approve] }}
           </td>
           <td>
-            <i class="remove-bt" @click="showRemove(item.id)">删除</i>
+            <i v-if="item.approve === 0" class="remove-bt" @click="showRemove(item.id)">删除</i>
+            <i v-else class="remove-bt remove-bt-no">删除</i>
           </td>
         </tr>
       </table>
@@ -301,8 +302,13 @@ onBeforeMount(() => {
     padding: 6px 12px;
     border-radius: 2px;
     cursor: pointer;
-    background-color: rgb(233, 143, 143);
+    background-color: rgb(225, 179, 179);
     color: rgb(255, 255, 255);
+  }
+
+  .remove-bt-no {
+    cursor: auto;
+    background-color: rgb(185, 185, 185);
   }
   .detail-bt {
     background-color: @theme-main-color1;

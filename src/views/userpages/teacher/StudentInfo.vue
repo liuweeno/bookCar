@@ -2,6 +2,8 @@
   <div class="appmain">
     <div class="carInfo">
       <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加新的用户</a-button>
+      <span>Tips: 0为学员、1为教练、2为管理员</span>
+      {{ editableData }}
       <a-table :columns="columns" :data-source="dataSource" bordered>
         <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
           <div style="padding: 8px">
@@ -29,14 +31,23 @@
           <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
         </template>
         <template #bodyCell="{ column, text, record }">
-          <template v-if="['phone', 'idCard'].includes(column.dataIndex)">
+          <template v-if="column.dataIndex === 'sex'">
+            {{ text === 0 ? '男' : '女' }}
+          </template>
+          <template v-else-if="['idCard', 'role', 'coachPhone'].includes(column.dataIndex)">
             <div>
               <a-input
                 v-if="editableData[record.id]"
                 v-model:value="editableData[record.id][column.dataIndex]"
                 style="margin: -5px 0"
               />
-              <template v-else> {{ text }} </template>
+              <template v-else-if="column.dataIndex === 'role'">
+                {{ text === 0 ? '学员' : text === 1 ? '教练' : '管理员' }}
+              </template>
+
+              <template v-else>
+                {{ text }}
+              </template>
             </div>
           </template>
           <template v-else-if="column.dataIndex === 'operation'">
@@ -51,6 +62,9 @@
                 <a @click="edit(record.id)">修改</a>
               </span>
             </div>
+            <a-popconfirm v-if="dataSource.length" title="确认删除?" @confirm="onDelete(record.phone)">
+              <a>删除</a>
+            </a-popconfirm>
           </template>
         </template>
       </a-table>
@@ -103,7 +117,7 @@
 import { reactive, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 import { onMounted } from 'vue';
-import { addNewUser, editUserInfo, getAllUser } from '@/api/admin.js';
+import { addNewUser, editUserInfo, getAllUser, deleteUser } from '@/api/admin.js';
 import Bus from '@/utils/bus';
 import { SearchOutlined } from '@ant-design/icons-vue';
 
@@ -166,18 +180,22 @@ const columns = [
     dataIndex: 'realName',
   },
   {
+    id: 'coachName',
+    title: '教练名字',
+    dataIndex: 'coachName',
+  },
+  {
+    id: 'coachPhone',
+    title: '教练电话',
+    dataIndex: 'coachPhone',
+  },
+  {
     id: 'operation',
     title: '操作',
     dataIndex: 'operation',
   },
 ];
-const dataSource = ref([
-  {
-    id: '121',
-    phone: '12345678901',
-    role: 1,
-  },
-]);
+const dataSource = ref([]);
 const editableData = reactive({});
 const showAddModal = ref(false);
 const newUerForm = reactive({
@@ -199,7 +217,8 @@ const edit = (key) => {
 const save = async (key) => {
   console.log('当前的key', key);
   Object.assign(dataSource.value.filter((item) => key === item.id)[0], editableData[key]);
-  const res = await editUserInfo({ id: key, phone: editableData[key].ownerPhone });
+  const { coachName, ...obj } = editableData[key];
+  const res = await editUserInfo(obj);
   if (res.code === 200) {
     Bus.$emit('popMes', { type: 'success', text: '修改学生信息成功' }); // tip success err
   } else {
@@ -244,12 +263,25 @@ async function onFinish() {
 
 async function getData() {
   const res = await getAllUser({});
-  res.data.forEach((item) => {
-    item.role = showRole[item.role];
-    item.sex = showSex[item.sex];
+  if (res.code !== 200) {
+    Bus.$emit('popMes', { type: 'err', text: '获取用户信息失败' }); // tip success err
+    return;
+  }
+  const newArray = res.data.map((item) => {
+    const { coachId, deleteTime, hashPw, ...obj } = item;
+    return obj;
   });
-  dataSource.value = res.data;
-  console.log(res);
+  dataSource.value = newArray;
+}
+
+async function onDelete(phone) {
+  const res = await deleteUser({ phone });
+  if (res.code === 200) {
+    Bus.$emit('popMes', { type: 'success', text: '删除用户成功' }); // tip success err
+    await getData();
+  } else {
+    Bus.$emit('popMes', { type: 'err', text: '删除用户失败' }); // tip success err
+  }
 }
 
 onMounted(() => {

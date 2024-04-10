@@ -8,6 +8,9 @@
           <th>学生手机号</th>
           <th>时期</th>
           <th>具体时间段</th>
+          <th>教练</th>
+          <th>教练手机号</th>
+          <th>审核状态</th>
         </tr>
         <tr v-show="data.studentOrderList === []">
           <td class="nodata" colspan="6">No Data</td>
@@ -17,23 +20,18 @@
           <td>{{ item.studentPhone }}</td>
           <td>{{ item.date }}</td>
           <td>{{ timeShow[item.time] }}</td>
+          <td>{{ item.coachName }}</td>
+          <td>{{ item.coachPhone }}</td>
+          <td>{{ statusShow[item.approve] }}</td>
         </tr>
       </table>
-    </div>
-
-    <div class="appmask" v-show="data.maskShow">
-      <div class="mesbox">
-        <p class="title">确认取消</p>
-        <i class="comfirm-bt" @click="cancelCourse()">确认</i>
-        <i class="cancel-bt" @click="data.maskShow = false">取消</i>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { onBeforeMount, reactive } from 'vue';
-import { reSelectCourse, reSelectOrCancelCourse } from '@/api/user.js';
+import { getAllOrder, reSelectOrCancelCourse } from '@/api/admin.js';
 import { useRouter } from 'vue-router';
 import Bus from '@/utils/bus';
 import { getStudentOrder } from '@/api/coach';
@@ -44,21 +42,12 @@ const data = reactive({
   maskShow: false,
 });
 const timeShow = ['上午', '下午', '晚上'];
+const statusShow = ['未审核', '审核通过', '拒绝审核'];
 //获取课程数据
-
-function sortByDate(arr) {
-  return arr.sort((a, b) => new Date(a.date) - new Date(b.date));
-}
-
 async function updataData() {
-  const result = await getStudentOrder();
+  const result = await getAllOrder();
   if (result.code && result.code === 200) {
-    data.studentOrderList = sortByDate(
-      result.data.filter((item, index) => {
-        console.log(index, item);
-        return item.approve == 1;
-      }),
-    ).reverse();
+    data.studentOrderList = result.data;
     console.log(data.studentOrderList);
   } else console.log('err', result);
 }

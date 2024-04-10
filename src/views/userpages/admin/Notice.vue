@@ -53,6 +53,9 @@
                 <a @click="edit(record.id)">修改</a>
               </span>
             </div>
+            <a-popconfirm v-if="dataSource.length" title="确认删除?" @confirm="onDelete(record.id)">
+              <a>删除</a>
+            </a-popconfirm>
           </template>
         </template>
       </a-table>
@@ -86,7 +89,7 @@
 import { reactive, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 import { onMounted } from 'vue';
-import { addNotice, editNotice, editCarInfo } from '@/api/admin.js';
+import { addNotice, editNotice, deleteNotice } from '@/api/admin.js';
 import Bus from '@/utils/bus';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { getNotice } from '@/api/user';
@@ -187,6 +190,17 @@ async function getData() {
     dataSource.value = res.data;
   });
   console.log(res);
+}
+
+async function onDelete(id) {
+  await deleteNotice({ id }).then((res) => {
+    if (res.code === 200) {
+      Bus.$emit('popMes', { type: 'success', text: '删除公告成功' }); // tip success err
+      getData();
+    } else {
+      Bus.$emit('popMes', { type: 'err', text: '删除公告失败' }); // tip success err
+    }
+  });
 }
 
 onMounted(() => {

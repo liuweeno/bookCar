@@ -44,6 +44,7 @@
 <script setup>
 import { register } from '@/api/register';
 import { reactive, ref } from 'vue';
+import router from '@/router/router';
 const formRef = ref();
 const registerForm = reactive({
   phone: '',

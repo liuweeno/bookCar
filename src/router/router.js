@@ -103,8 +103,14 @@ const routes = [
       {
         path: 'notice',
         name: 'Notice',
-        component: () => import('@/views/userpages/admin/notice.vue'),
+        component: () => import('@/views/userpages/admin/Notice.vue'),
         meta: { title: '公告管理', icon: 'icon-xuesheng', limit: ['admin'], cache: true },
+      },
+      {
+        path: 'order',
+        name: 'Order',
+        component: () => import('@/views/userpages/admin/Order.vue'),
+        meta: { title: '预约管理', icon: 'icon-xuesheng', limit: ['admin'], cache: true },
       },
     ],
   },

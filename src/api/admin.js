@@ -31,3 +31,19 @@ export function addNotice(value) {
 export function editNotice(value) {
   return request.post('/admin/modify_announcement', value);
 }
+
+export function deleteUser(value) {
+  return request.post('/admin/delete_user', value);
+}
+
+export function deleteNotice(value) {
+  return request.post('/admin/delete_announcement', value);
+}
+
+export function deleteCar(value) {
+  return request.post('/admin/remove_vehicle', value);
+}
+
+export function getAllOrder(value) {
+  return request.post('/admin/query_reserve', value);
+}

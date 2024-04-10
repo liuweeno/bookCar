@@ -20,9 +20,13 @@
           <td>{{ item.date }}</td>
           <td>{{ timeShow[item.time] }}</td>
           <td>{{ approveShow[item.approve] }}</td>
-          <td>
+          <td v-if="item.approve === 0">
             <a-button type="primary" class="accept-btn" @click="confirmSelect(item.id, 1)">通过</a-button>
             <a-button type="primary" danger class="reject-btn" @click="confirmSelect(item.id, 2)">拒绝</a-button>
+          </td>
+          <td v-else>
+            <a-button type="primary" class="accept-btn-no">通过</a-button>
+            <a-button type="primary" danger class="reject-btn-no">拒绝</a-button>
           </td>
         </tr>
       </table>
@@ -149,6 +153,14 @@ onBeforeMount(() => {
 
   .reject-btn {
     background-color: palevioletred !important;
+  }
+
+  .accept-btn-no {
+    background-color: gainsboro !important;
+    margin-right: 8px;
+  }
+  .reject-btn-no {
+    background-color: gainsboro !important;
   }
 }
 

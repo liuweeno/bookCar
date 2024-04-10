@@ -27,28 +27,6 @@
     <span class="blank-fill"></span>
 
     <!-- 搜索区 -->
-    <span class="search-area">
-      <input
-        class="search-input"
-        placeholder="菜单搜索"
-        ref="searchInput"
-        @input="updataSearchList"
-        @blur="menuSearch(true, $event)"
-      />
-      <div class="gotoMenu-wrap" v-show="data.searchList">
-        <div class="tri"></div>
-        <div
-          class="gotoMenu"
-          v-for="item in data.searchList"
-          @mousedown="router.push({ name: item.name })"
-          :key="item.title"
-        >
-          {{ item.title }}
-        </div>
-        <div class="nodata" v-show="data.searchList && data.searchList.length === 0">No Data</div>
-      </div>
-      <i class="iconfont icon-search right-icon" @mousedown="menuSearch(false, $event)"></i>
-    </span>
     <!-- 全屏 -->
     <i class="iconfont icon-expand-alt right-icon" @click="fullScrean"></i>
     <!-- 改变字体设置 -->
@@ -73,15 +51,6 @@
       <p class="user-name">{{ userStore.userName }}</p>
       <i class="iconfont icon-angle-down user-arrow"></i>
       <div class="user-menu">
-        <div class="menu" @click="router.push({ name: 'UserInfo' })">个人信息</div>
-        <div class="menu roleSelect">
-          角色(开发测试)
-          <div class="role-wrap">
-            <div @click="selectRole('admin')">管理员</div>
-            <div @click="selectRole('teacher')">教师</div>
-            <div @click="selectRole('student')">学生</div>
-          </div>
-        </div>
         <div class="menu logout" @click="logout">退出登录</div>
       </div>
     </span>
