@@ -3,7 +3,6 @@
     <div class="carInfo">
       <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加新的用户</a-button>
       <span>Tips: 0为学员、1为教练、2为管理员</span>
-      {{ editableData }}
       <a-table :columns="columns" :data-source="dataSource" bordered>
         <template #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
           <div style="padding: 8px">

@@ -52,10 +52,6 @@
               <a-radio :value="2">晚上</a-radio>
             </a-radio-group>
           </div>
-          <div class="mes-div">
-            <span class="mes-span">备注</span>
-            <textarea v-model="reserveParams.remark" placeholder="添加备注" class="remark-textarea"></textarea>
-          </div>
 
           <i class="comfirm-bt" @click="addReserveFn">确认</i>
           <i class="cancel-bt" @click="addReserveShow = false">取消</i>
