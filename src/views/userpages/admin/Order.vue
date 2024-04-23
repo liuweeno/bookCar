@@ -22,7 +22,7 @@
           <td>{{ timeShow[item.time] }}</td>
           <td>{{ item.coachName }}</td>
           <td>{{ item.coachPhone }}</td>
-          <td>{{ statusShow[item.approve] }}</td>
+          <td>{{ item.approve === 0 && item.deleteTime !== null ? '已删除' : statusShow[item.approve] }}</td>
         </tr>
       </table>
     </div>

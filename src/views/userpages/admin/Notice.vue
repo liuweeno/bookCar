@@ -174,6 +174,10 @@ const confirmAdd = () => {
 };
 
 async function onFinish() {
+  if (newNoticeForm.title.length === 0 || newNoticeForm.text.length === 0) {
+    alert('不能含有空白');
+    return;
+  }
   const res = await addNotice(newNoticeForm);
   console.log(res);
   if (res.code == 200) {

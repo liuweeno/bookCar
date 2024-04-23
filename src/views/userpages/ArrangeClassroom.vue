@@ -21,10 +21,12 @@
           <td>{{ timeShow[item.time] }}</td>
           <td>{{ userStore.coachName === null ? '未绑定教练' : userStore.coachName }}</td>
           <td class="time-slot">
-            {{ approveShow[item.approve] }}
+            {{ item.approve === 0 && item.deleteTime !== null ? '已删除' : approveShow[item.approve] }}
           </td>
           <td>
-            <i v-if="item.approve === 0" class="remove-bt" @click="showRemove(item.id)">删除</i>
+            <i v-if="item.approve === 0 && item.deleteTime === null" class="remove-bt" @click="showRemove(item.id)"
+              >删除</i
+            >
             <i v-else class="remove-bt remove-bt-no">删除</i>
           </td>
         </tr>
@@ -38,7 +40,7 @@
 
           <div class="mes-div">
             <SelectBlock atr="月份" describe="请选择月份" v-model="reserveParams.month">
-              <li v-for="i in 3" :key="i">{{ date.getMonth() + i }}</li>
+              <li v-for="i in 6" :key="i">{{ date.getMonth() + i }}</li>
             </SelectBlock>
             <SelectBlock atr="日期" describe="请选择日期" v-model="reserveParams.day" :change="getUsableClassroom">
               <li v-for="i in dataLimt" :key="i">{{ i }}</li>

@@ -19,8 +19,8 @@
           <td>{{ item.studentPhone }}</td>
           <td>{{ item.date }}</td>
           <td>{{ timeShow[item.time] }}</td>
-          <td>{{ approveShow[item.approve] }}</td>
-          <td v-if="item.approve === 0">
+          <td>{{ item.approve === 0 && item.deleteTime !== null ? '已删除' : approveShow[item.approve] }}</td>
+          <td v-if="item.approve === 0 && item.deleteTime === null">
             <a-button type="primary" class="accept-btn" @click="confirmSelect(item.id, 1)">通过</a-button>
             <a-button type="primary" danger class="reject-btn" @click="confirmSelect(item.id, 2)">拒绝</a-button>
           </td>
@@ -59,6 +59,7 @@ const data = reactive({
       date: '2021-10-10',
       time: 1,
       approve: 0,
+      deleteTime: '2020',
     },
   ],
   maskShow: false,
