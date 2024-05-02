@@ -56,15 +56,6 @@ async function loginHandle() {
   let result2 = await userStore.updataUserInfo();
   if (result2) router.push('/');
 }
-// async function loginHandle() {
-//   const params = { ...logindata };
-//   const result = await reLogin(params);
-//   if (result.code && result.code === 200) {
-//     userStore.updataToken(result.data.token);
-//     let result2 = await userStore.updataUserInfo();
-//     if (result2) router.push('/');
-//   }
-// }
 
 const goRegister = () => {
   router.push('/register');

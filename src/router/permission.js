@@ -2,7 +2,7 @@ import router from './router';
 import { useUserStore } from '@/store';
 //加载进度条
 import NProgress from '@/utils/nprogress';
-
+//路由守卫
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore();
   NProgress.start();

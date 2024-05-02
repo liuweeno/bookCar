@@ -1,22 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Layout from '@/views/layout/Layout.vue';
 
-/*
-路由说明：
-    新增的路由可挂载到路由'/'的子路由下，也可直接新增路由项。
-    带有子路由的路由项默认在侧边栏菜单呈现嵌套结构，支持多重路由嵌套。
-    name：应该与路由对应的组件名称一致，否则KeepAlive无法正常工作
-    meta{
-        title:侧边栏菜单名
-        icon：显示在侧边栏的图标（本项目使用阿里图标库的css图标）
-        limit：权限控制，列表项为能访问到当前路由的角色，与当前角色权限不符的路由不会显示在侧边栏菜单
-        fixCache：是否固定缓存该路由对应的组件，选择此项的路由同时会固定在tagViews不可删除
-        cache：是否缓存该路由对应的组件，可在tagViews中清除
-        isLink：表明该路由对应外链
-        hideInMenu:决定当前路由是否在侧边栏菜单隐藏
-    }
-*/
-
 const routes = [
   {
     path: '/login',
@@ -54,12 +38,6 @@ const routes = [
         redirect: '/classroom/classroom-query',
         meta: { title: '预约', icon: 'icon-jiaoshi', limit: ['student'] },
         children: [
-          // {
-          //   path: 'classroom-query',
-          //   name: 'ClassRoom',
-          //   component: () => import('@/views/userpages/ClassRoom.vue'),
-          //   meta: { title: '教室查询', icon: '', limit: ['admin', 'teacher', 'student'], cache: true },
-          // },
           {
             path: 'arrange-classroom',
             name: 'ArrangeClassroom',

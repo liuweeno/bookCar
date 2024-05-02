@@ -119,17 +119,6 @@ function getDayLimt(year, month) {
   return dayList[month - 1];
 }
 const dataLimt = ref(getDayLimt(date.getFullYear(), date.getMonth() + 1));
-const areaMap = {
-  ds: '东区',
-  zq: '主校区',
-  ql: '启林',
-  xq: '西校区',
-};
-const checkMap = {
-  wait: '审核中',
-  true: '审核通过',
-  false: '审核未通过',
-};
 const timeShow = ['上午', '下午', '晚上'];
 const approveShow = ['等待审批', '审批通过', '拒绝预约'];
 
