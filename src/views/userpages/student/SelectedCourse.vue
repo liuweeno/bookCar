@@ -1,7 +1,10 @@
 <template>
   <div class="appmain">
     <div class="appcart courselist-wrap">
-      <h2 class="title">已审核通过的预约</h2>
+      <h2 class="title">
+        今日已审核通过的人数: 上午 {{ approvePeople.am }} 人 下午 {{ approvePeople.pm }} 人 晚上
+        {{ approvePeople.night }} 人
+      </h2>
       <table class="apptable">
         <tr>
           <th>学生姓名</th>
@@ -32,12 +35,14 @@
 </template>
 
 <script setup>
-import { onBeforeMount, reactive } from 'vue';
+import { onBeforeMount, reactive, ref } from 'vue';
 import { reSelectCourse, reSelectOrCancelCourse } from '@/api/user.js';
 import { useRouter } from 'vue-router';
 import Bus from '@/utils/bus';
 import { getStudentOrder } from '@/api/coach';
+import dayjs from 'dayjs';
 
+const approvePeople = ref({ am: 0, pm: 0, night: 0 });
 const router = useRouter();
 const data = reactive({
   courseList: [],
@@ -52,7 +57,15 @@ function sortByDate(arr) {
 
 async function updataData() {
   const result = await getStudentOrder();
+  let today = dayjs().format('YYYY-MM-DD');
   if (result.code && result.code === 200) {
+    result.data.forEach((item) => {
+      if (item.approve === 1 && item.date === today) {
+        if (item.time === 0) approvePeople.value.am++;
+        else if (item.time === 1) approvePeople.value.pm++;
+        else if (item.time === 2) approvePeople.value.night++;
+      }
+    });
     data.studentOrderList = sortByDate(
       result.data.filter((item, index) => {
         console.log(index, item);
@@ -97,8 +110,7 @@ onBeforeMount(() => {
     color: rgb(148, 148, 148);
     font-size: calc(@baseSize * 1.2);
     font-weight: bolder;
-    width: 180px;
-    margin: auto;
+    //width: 180px;
     margin-bottom: 16px;
   }
 

@@ -1,7 +1,10 @@
 <template>
   <div class="appmain">
     <div class="appcart courselist-wrap">
-      <h2 class="title">已审核通过的预约</h2>
+      <h2 class="title">
+        今日已审核通过的人数: 上午 {{ approvePeople.am }} 人 下午 {{ approvePeople.pm }} 人 晚上
+        {{ approvePeople.night }} 人
+      </h2>
       <table class="apptable">
         <tr>
           <th>学生姓名</th>
@@ -30,51 +33,35 @@
 </template>
 
 <script setup>
-import { onBeforeMount, reactive } from 'vue';
+import { onBeforeMount, reactive, ref } from 'vue';
 import { getAllOrder, reSelectOrCancelCourse } from '@/api/admin.js';
 import { useRouter } from 'vue-router';
-import Bus from '@/utils/bus';
-import { getStudentOrder } from '@/api/coach';
+import dayjs from 'dayjs';
 
 const router = useRouter();
 const data = reactive({
   courseList: [],
   maskShow: false,
 });
+const approvePeople = ref({ am: 0, pm: 0, night: 0 });
 const timeShow = ['上午', '下午', '晚上'];
 const statusShow = ['未审核', '审核通过', '拒绝审核'];
 //获取课程数据
 async function updataData() {
   const result = await getAllOrder();
+  let today = dayjs().format('YYYY-MM-DD');
   if (result.code && result.code === 200) {
+    result.data.forEach((item) => {
+      if (item.approve === 1 && item.date === today) {
+        if (item.time === 0) approvePeople.value.am++;
+        else if (item.time === 1) approvePeople.value.pm++;
+        else if (item.time === 2) approvePeople.value.night++;
+      }
+    });
     data.studentOrderList = result.data;
     console.log(data.studentOrderList);
   } else console.log('err', result);
 }
-
-//取消确认
-function confirmCancel(item) {
-  if (item.isNecess) {
-    Bus.$emit('popMes', { type: 'tip', text: '必修课程不可取消' });
-    return;
-  }
-  data.maskShow = true;
-  data.toBeCancel = item.courseName;
-}
-//取消课程
-async function cancelCourse() {
-  const result = await reSelectOrCancelCourse({
-    action: 'cancel',
-    courseName: data.toBeCancel,
-  });
-  data.toBeCancel = null;
-  data.maskShow = false;
-  if (result.code && result.code == 200) {
-    Bus.$emit('popMes', { type: 'success', text: '取消课程成功' });
-    updataData();
-  } else console.log('err', result);
-}
-
 onBeforeMount(() => {
   updataData();
 });
@@ -86,8 +73,7 @@ onBeforeMount(() => {
     color: rgb(148, 148, 148);
     font-size: calc(@baseSize * 1.2);
     font-weight: bolder;
-    width: 180px;
-    margin: auto;
+    //width: 180px;
     margin-bottom: 16px;
   }
 
